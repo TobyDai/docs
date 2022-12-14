@@ -625,8 +625,8 @@ purposes, collection of additional metadata must be configured:
 | `ASSETS_CONTENT_SECURITY_POLICY`       | Custom overrides for the Content-Security-Policy header. See [helmet's documentation](https://helmetjs.github.io) for more information. | --            |
 | `ASSETS_FAIL_ON_INVALID_IMAGE`         | Level of sensitivity to invalid images. See the [`sharp.failOn`](https://sharp.pixelplumbing.com/api-constructor#parameters) option     | `warning`     |
 
-TEST Image transformations can be fairly heavy on memory usage. If you're using a system with 1GB or less available
-memory, we recommend lowering the allowed concurrent transformations to prevent you from overflowing your server.
+Image transformations can be fairly heavy on memory usage. If you're using a system with 1GB or less available memory,
+we recommend lowering the allowed concurrent transformations to prevent you from overflowing your server.
 
 ## Authentication
 
