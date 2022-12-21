@@ -199,7 +199,7 @@ prefixing the value with `{type}:`. The following types are available:
 | `PUBLIC_URL`<sup>[1]</sup> | URL where your API can be reached on the web.                                                              | `/`           |
 | `LOG_LEVEL`                | What level of detail to log. One of `fatal`, `error`, `warn`, `info`, `debug`, `trace` or `silent`.        | `info`        |
 | `LOG_STYLE`                | Render the logs human readable (pretty) or as JSON. One of `pretty`, `raw`.                                | `pretty`      |
-| `MAX_PAYLOAD_SIZE`         | Controls the maximum request body size. Accepts number of bytes, or human readable string.                 | `100kb`       |
+| `MAX_PAYLOAD_SIZE`         | Controls the maximum request body size. Accepts number of bytes, or human readable string.                 | `1mb`         |
 | `ROOT_REDIRECT`            | Where to redirect to when navigating to `/`. Accepts a relative path, absolute URL, or `false` to disable. | `./admin`     |
 | `SERVE_APP`                | Whether or not to serve the Admin App under `/admin`.                                                      | `true`        |
 | `GRAPHQL_INTROSPECTION`    | Whether or not to enable GraphQL Introspection                                                             | `true`        |
@@ -340,6 +340,13 @@ multiplied. This may cause out of memory errors, especially when running in cont
 | `CORS_CREDENTIALS`     | Whether or not to send the `Access-Control-Allow-Credentials` header.                                                                                  | `true`                       |
 | `CORS_MAX_AGE`         | Value for the `Access-Control-Max-Age` header.                                                                                                         | `18000`                      |
 
+:::tip More Details
+
+For more details about each configuration variable, please see the
+[CORS package documentation](https://www.npmjs.com/package/cors#configuration-options).
+
+:::
+
 ## Rate Limiting
 
 You can use the built-in rate-limiter to prevent users from hitting the API too much. Simply enabling the rate-limiter
@@ -369,11 +376,13 @@ No additional configuration required.
 
 Alternatively, you can provide the individual connection parameters:
 
-| Variable                      | Description                      | Default Value |
-| ----------------------------- | -------------------------------- | ------------- |
-| `RATE_LIMITER_REDIS_HOST`     | Hostname of the Redis instance   | --            |
-| `RATE_LIMITER_REDIS_PORT`     | Port of the Redis instance       | --            |
-| `RATE_LIMITER_REDIS_PASSWORD` | Password for your Redis instance | --            |
+| Variable                      | Description                                                   | Default Value |
+| ----------------------------- | ------------------------------------------------------------- | ------------- |
+| `RATE_LIMITER_REDIS_HOST`     | Hostname of the Redis instance, e.g., `"127.0.0.1"`           | --            |
+| `RATE_LIMITER_REDIS_PORT`     | Port of the Redis instance, e.g., `6379`                      | --            |
+| `RATE_LIMITER_REDIS_USERNAME` | Username for your Redis instance, e.g., `"default"`           | --            |
+| `RATE_LIMITER_REDIS_PASSWORD` | Password for your Redis instance, e.g., `"yourRedisPassword"` | --            |
+| `RATE_LIMITER_REDIS_DB`       | Database of your Redis instance to connect, e.g., `1`         | --            |
 
 ### Memcache
 
@@ -409,6 +418,13 @@ RATE_LIMITER_DURATION="5"
 RATE_LIMITER_STORE="redis"
 
 RATE_LIMITER_REDIS="redis://@127.0.0.1"
+
+# If you are using Redis ACL
+RATE_LIMITER_REDIS_USERNAME="default"
+RATE_LIMITER_REDIS_PASSWORD="yourRedisPassword"
+RATE_LIMITER_REDIS_HOST="127.0.0.1"
+RATE_LIMITER_REDIS_PORT=6379
+RATE_LIMITER_REDIS_DB=0
 ```
 
 ## Cache
@@ -421,7 +437,7 @@ middleman servers (like CDNs) and even the browser.
 
 :::tip Internal Caching
 
-In addition to data-caching, Directus also does some internal caching. Note `SCHEMA_CACHE` and `CACHE_PERMISSIONS` which
+In addition to data-caching, Directus also does some internal caching. Note `CACHE_SCHEMA` and `CACHE_PERMISSIONS` which
 are enabled by default. These speed up the overall performance of Directus, as we don't want to introspect the whole
 database or check all permissions on every request. When running Directus load balanced, you'll need to use a shared
 cache storage (like [Redis](#redis-2) or [Memcache](#memcache-2)) or else disable all caching.
@@ -478,11 +494,13 @@ No additional configuration required.
 
 Alternatively, you can provide the individual connection parameters:
 
-| Variable               | Description                      | Default Value |
-| ---------------------- | -------------------------------- | ------------- |
-| `CACHE_REDIS_HOST`     | Hostname of the Redis instance   | --            |
-| `CACHE_REDIS_PORT`     | Port of the Redis instance       | --            |
-| `CACHE_REDIS_PASSWORD` | Password for your Redis instance | --            |
+| Variable               | Description                                                   | Default Value |
+| ---------------------- | ------------------------------------------------------------- | ------------- |
+| `CACHE_REDIS_HOST`     | Hostname of the Redis instance, e.g., `"127.0.0.1"`           | --            |
+| `CACHE_REDIS_PORT`     | Port of the Redis instance, e.g., `6379`                      | --            |
+| `CACHE_REDIS_USERNAME` | Username for your Redis instance, e.g., `"default"`           | --            |
+| `CACHE_REDIS_PASSWORD` | Password for your Redis instance, e.g., `"yourRedisPassword"` | --            |
+| `CACHE_REDIS_DB`       | Database of your Redis instance to connect, e.g., `1`         | --            |
 
 ### Memcache
 
@@ -493,10 +511,10 @@ Alternatively, you can provide the individual connection parameters:
 ## File Storage
 
 By default, Directus stores all uploaded files locally on disk. However, you can also configure Directus to use S3,
-Google Cloud Storage, or Azure. You can also configure _multiple_ storage adapters at the same time. This allows you to
-choose where files are being uploaded on a file-by-file basis. In the Admin App, files will automatically be uploaded to
-the first configured storage location (in this case `local`). The used storage location is saved under `storage` in
-`directus_files`.
+Google Cloud Storage, Azure, or Cloudinary. You can also configure _multiple_ storage adapters at the same time. This
+allows you to choose where files are being uploaded on a file-by-file basis. In the Admin App, files will automatically
+be uploaded to the first configured storage location (in this case `local`). The used storage location is saved under
+`storage` in `directus_files`.
 
 ::: tip File Storage Default
 
@@ -534,11 +552,11 @@ STORAGE_S3_DRIVER="s3" # Will work, "s3" is uppercased ✅
 
 For each of the storage locations listed, you must provide the following configuration:
 
-| Variable                                   | Description                                               | Default Value |
-| ------------------------------------------ | --------------------------------------------------------- | ------------- |
-| `STORAGE_<LOCATION>_DRIVER`                | Which driver to use, either `local`, `s3`, `gcs`, `azure` |               |
-| `STORAGE_<LOCATION>_ROOT`                  | Where to store the files on disk                          | `''`          |
-| `STORAGE_<LOCATION>_HEALTHCHECK_THRESHOLD` | Healthcheck timeout threshold in ms.                      | `750`         |
+| Variable                                   | Description                                                             | Default Value |
+| ------------------------------------------ | ----------------------------------------------------------------------- | ------------- |
+| `STORAGE_<LOCATION>_DRIVER`                | Which driver to use, either `local`, `s3`, `gcs`, `azure`, `cloudinary` |               |
+| `STORAGE_<LOCATION>_ROOT`                  | Where to store the files on disk                                        | `''`          |
+| `STORAGE_<LOCATION>_HEALTHCHECK_THRESHOLD` | Healthcheck timeout threshold in ms.                                    | `750`         |
 
 Based on your configured driver, you must also provide the following configurations:
 
@@ -550,24 +568,24 @@ Based on your configured driver, you must also provide the following configurati
 
 ### S3 (`s3`)
 
-| Variable                      							| Description 							| Default Value      |
-| ------------------------------------------- | -------------------------	| ------------------ |
-| `STORAGE_<LOCATION>_KEY`      							| User key    							| --                 |
-| `STORAGE_<LOCATION>_SECRET`   							| User secret 							| --                 |
-| `STORAGE_<LOCATION>_BUCKET`   							| S3 Bucket   							| --                 |
-| `STORAGE_<LOCATION>_REGION`   							| S3 Region   							| --                 |
-| `STORAGE_<LOCATION>_ENDPOINT` 							| S3 Endpoint 							| `s3.amazonaws.com` |
-| `STORAGE_<LOCATION>_ACL`      							| S3 ACL      							| --                 |
-| `STORAGE_<LOCATION>_SERVER_SIDE_ENCRYPTION`	| S3 Server Side Encryption	| --                 |
+| Variable                                    | Description               | Default Value      |
+| ------------------------------------------- | ------------------------- | ------------------ |
+| `STORAGE_<LOCATION>_KEY`                    | User key                  | --                 |
+| `STORAGE_<LOCATION>_SECRET`                 | User secret               | --                 |
+| `STORAGE_<LOCATION>_BUCKET`                 | S3 Bucket                 | --                 |
+| `STORAGE_<LOCATION>_REGION`                 | S3 Region                 | --                 |
+| `STORAGE_<LOCATION>_ENDPOINT`               | S3 Endpoint               | `s3.amazonaws.com` |
+| `STORAGE_<LOCATION>_ACL`                    | S3 ACL                    | --                 |
+| `STORAGE_<LOCATION>_SERVER_SIDE_ENCRYPTION` | S3 Server Side Encryption | --                 |
 
 ### Azure (`azure`)
 
-| Variable                            | Description                | Default Value                                 |
-| ----------------------------------- | -------------------------- | --------------------------------------------- |
-| `STORAGE_<LOCATION>_CONTAINER_NAME` | Azure Storage container    | --                                            |
-| `STORAGE_<LOCATION>_ACCOUNT_NAME`   | Azure Storage account name | --                                            |
-| `STORAGE_<LOCATION>_ACCOUNT_KEY`    | Azure Storage key          | --                                            |
-| `STORAGE_<LOCATION>_ENDPOINT`       | Azure URL                  | `https://{ACCOUNT_KEY}.blob.core.windows.net` |
+| Variable                            | Description                | Default Value                                  |
+| ----------------------------------- | -------------------------- | ---------------------------------------------- |
+| `STORAGE_<LOCATION>_CONTAINER_NAME` | Azure Storage container    | --                                             |
+| `STORAGE_<LOCATION>_ACCOUNT_NAME`   | Azure Storage account name | --                                             |
+| `STORAGE_<LOCATION>_ACCOUNT_KEY`    | Azure Storage key          | --                                             |
+| `STORAGE_<LOCATION>_ENDPOINT`       | Azure URL                  | `https://{ACCOUNT_NAME}.blob.core.windows.net` |
 
 ### Google Cloud Storage (`gcs`)
 
@@ -575,6 +593,29 @@ Based on your configured driver, you must also provide the following configurati
 | --------------------------------- | --------------------------- | ------------- |
 | `STORAGE_<LOCATION>_KEY_FILENAME` | Path to key file on disk    | --            |
 | `STORAGE_<LOCATION>_BUCKET`       | Google Cloud Storage bucket | --            |
+
+    cloudName: string;
+    apiKey: string;
+    apiSecret: string;
+    accessMode: 'public' | 'authenticated';
+
+};
+
+### Cloudinary (`cloudinary`)
+
+| Variable                         | Description                                                         | Default Value |
+| -------------------------------- | ------------------------------------------------------------------- | ------------- |
+| `STORAGE_<LOCATION>_CLOUD_NAME`  | Cloudinary Cloud Name                                               | --            |
+| `STORAGE_<LOCATION>_API_KEY`     | Cloudinary API Key                                                  | --            |
+| `STORAGE_<LOCATION>_API_SECRET`  | Cloudinary API Secret                                               | --            |
+| `STORAGE_<LOCATION>_ACCESS_MODE` | Default access mode for the file. One of `public`, `authenticated`. | --            |
+
+::: warning One-way sync
+
+Cloudinary is supported as a _storage_ driver. Changes made on Cloudinary are _not_ synced back to Directus, and
+Directus _won't_ rely on Cloudinary's asset transformations in the `/assets` endpoint.
+
+:::
 
 ### Example: Multiple Storage Adapters
 
@@ -607,7 +648,7 @@ purposes, collection of additional metadata must be configured:
 
 | Variable                               | Description                                                                                                                             | Default Value |
 | -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | ------------- |
-| `ASSETS_CACHE_TTL`                     | How long assets will be cached for in the browser. Sets the `max-age` value of the `Cache-Control` header.                              | `30m`         |
+| `ASSETS_CACHE_TTL`                     | How long assets will be cached for in the browser. Sets the `max-age` value of the `Cache-Control` header.                              | `30d`         |
 | `ASSETS_TRANSFORM_MAX_CONCURRENT`      | How many file transformations can be done simultaneously                                                                                | `4`           |
 | `ASSETS_TRANSFORM_IMAGE_MAX_DIMENSION` | The max pixel dimensions size (width/height) that is allowed to be transformed                                                          | `6000`        |
 | `ASSETS_TRANSFORM_MAX_OPERATIONS`      | The max number of transform operations that is allowed to be processed (excludes saved presets)                                         | `5`           |
@@ -625,9 +666,9 @@ we recommend lowering the allowed concurrent transformations to prevent you from
 
 For each auth provider you list, you must also provide the following configuration:
 
-| Variable                 | Description                                                     | Default Value |
-| ------------------------ | --------------------------------------------------------------- | ------------- |
-| `AUTH_<PROVIDER>_DRIVER` | Which driver to use, either `local`, `oauth2`, `openid`, `ldap` | --            |
+| Variable                 | Description                                                             | Default Value |
+| ------------------------ | ----------------------------------------------------------------------- | ------------- |
+| `AUTH_<PROVIDER>_DRIVER` | Which driver to use, either `local`, `oauth2`, `openid`, `ldap`, `saml` | --            |
 
 You may also be required to specify additional variables depending on the auth driver. See configuration details below.
 
@@ -688,6 +729,7 @@ These flows rely on the `PUBLIC_URL` variable for redirecting. Ensure the variab
 | `AUTH_<PROVIDER>_ALLOW_PUBLIC_REGISTRATION` | Automatically create accounts for authenticating users.                                       | `false`          |
 | `AUTH_<PROVIDER>_DEFAULT_ROLE_ID`           | A Directus role ID to assign created users.                                                   | --               |
 | `AUTH_<PROVIDER>_ICON`                      | SVG icon to display with the login link. [See options here](/getting-started/glossary#icons). | `account_circle` |
+| `AUTH_<PROVIDER>_LABEL`                     | Text to be presented on SSO button within App.                                                | `<PROVIDER>`     |
 | `AUTH_<PROVIDER>_PARAMS`                    | Custom query parameters applied to the authorization URL.                                     | --               |
 
 <sup>[1]</sup> When authenticating, Directus will match the identifier value from the external user profile to a
@@ -708,6 +750,7 @@ OpenID is an authentication protocol built on OAuth 2.0, and should be preferred
 | `AUTH_<PROVIDER>_REQUIRE_VERIFIED_EMAIL`    | Require created users to have a verified email address.                                       | `false`                |
 | `AUTH_<PROVIDER>_DEFAULT_ROLE_ID`           | A Directus role ID to assign created users.                                                   | --                     |
 | `AUTH_<PROVIDER>_ICON`                      | SVG icon to display with the login link. [See options here](/getting-started/glossary#icons). | `account_circle`       |
+| `AUTH_<PROVIDER>_LABEL`                     | Text to be presented on SSO button within App.                                                | `<PROVIDER>`           |
 | `AUTH_<PROVIDER>_PARAMS`                    | Custom query parameters applied to the authorization URL.                                     | --                     |
 
 <sup>[1]</sup> When authenticating, Directus will match the identifier value from the external user profile to a
@@ -762,6 +805,31 @@ AUTH_LDAP_USER_DN="OU=Users,DC=ldap,DC=directus,DC=io"
 AUTH_LDAP_GROUP_DN="OU=Groups,DC=ldap,DC=directus,DC=io"
 ```
 
+### SAML
+
+SAML is an open-standard, XML-based authentication framework for authentication and authorization between two entities
+without a password.
+
+- Service provider (SP) agrees to trust the identity provider to authenticate users.
+
+- Identity provider (IdP) authenticates users and provides to service providers an authentication assertion that
+  indicates a user has been authenticated.
+
+| Variable                                    | Description                                                                | Default Value |
+| ------------------------------------------- | -------------------------------------------------------------------------- | ------------- |
+| `AUTH_<PROVIDER>_SP_metadata`               | String containing XML metadata for service provider or URL to a remote URL | --            |
+| `AUTH_<PROVIDER>_IDP_metadata`              | String container XML metadata for identity provider or URL to a remote URL | --            |
+| `AUTH_<PROVIDER>_ALLOW_PUBLIC_REGISTRATION` | Automatically create accounts for authenticating users.                    | `false`       |
+| `AUTH_<PROVIDER>_DEFAULT_ROLE_ID`           | A Directus role ID to assign created users.                                | --            |
+| `AUTH_<PROVIDER>_IDENTIFIER_KEY`            | User profile identifier key <sup>[1]</sup>. Will default to `EMAIL_KEY`.   | --            |
+| `AUTH_<PROVIDER>_EMAIL_KEY`                 | User profile email key.                                                    | `email`       |
+
+<sup>[1]</sup> When authenticating, Directus will match the identifier value from the external user profile to a
+Directus users "External Identifier".
+
+The `SP_metadata` and `IDP_metadata` variables should be set to the XML metadata provided by the service provider and
+identity provider respectively or can be set to a URL that will be fetched on startup.
+
 ### Example: Multiple Auth Providers
 
 You can configure multiple providers for handling authentication in Directus. This allows for different options when
@@ -776,6 +844,7 @@ AUTH_GOOGLE_CLIENT_SECRET="la23...4k2l"
 AUTH_GOOGLE_ISSUER_URL="https://accounts.google.com/.well-known/openid-configuration"
 AUTH_GOOGLE_IDENTIFIER_KEY="email"
 AUTH_GOOGLE_ICON="google"
+AUTH_GOOGLE_LABEL="Google"
 
 AUTH_FACEBOOK_DRIVER="oauth2"
 AUTH_FACEBOOK_CLIENT_ID="830d...29sd"
@@ -784,6 +853,7 @@ AUTH_FACEBOOK_AUTHORIZE_URL="https://www.facebook.com/dialog/oauth"
 AUTH_FACEBOOK_ACCESS_URL="https://graph.facebook.com/oauth/access_token"
 AUTH_FACEBOOK_PROFILE_URL="https://graph.facebook.com/me?fields=email"
 AUTH_FACEBOOK_ICON="facebook"
+AUTH_FACEBOOK_LABEL="Facebook"
 ```
 
 ## Extensions

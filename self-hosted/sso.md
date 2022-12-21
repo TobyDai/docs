@@ -11,11 +11,12 @@ systems.
 
 ## Supported SSO mechanisms
 
-Directus supports three standard types of SSO mechanisms:
+Directus supports four standard types of SSO mechanisms:
 
 - [OpenID](https://openid.net/specs/openid-connect-core-1_0.html)
 - [OAuth 2.0](https://www.ietf.org/rfc/rfc6750.txt)
 - [LDAP](https://datatracker.ietf.org/doc/html/rfc4511)
+- [SAML](https://datatracker.ietf.org/doc/html/rfc7522)
 
 Here are the configuration allowed for each one: [SSO configuration](/self-hosted/config-options#sso-oauth2-and-openid)
 
@@ -67,6 +68,7 @@ AUTH_GOOGLE_CLIENT_SECRET="XXXX" # Replace XXXX with the Client Secret from Step
 AUTH_GOOGLE_ISSUER_URL="https://accounts.google.com"
 AUTH_GOOGLE_IDENTIFIER_KEY="email"
 AUTH_GOOGLE_ICON="google"
+AUTH_GOOGLE_LABEL="Google"
 AUTH_GOOGLE_ALLOW_PUBLIC_REGISTRATION="true" # This allows users to be automatically created on logins. Use "false" if you want to create users manually
 AUTH_GOOGLE_DEFAULT_ROLE_ID="XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX" # Replace this with the Directus Role ID you would want for new users. If this is not properly configured, new users will not have access to Directus
 ```

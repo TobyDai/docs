@@ -204,6 +204,8 @@ const directus = new Directus(url, init);
     - `onUploadProgress` [optional] _(event:
       [ProgressEvent](https://developer.mozilla.org/en-US/docs/Web/API/ProgressEvent) => void)_ - Defines a callback
       function to indicate the upload progress.
+    - `maxBodyLength` [optional] _Number_ - The maximum body length in bytes. Set `Infinity` for no limit.
+    - `maxContentLength` [optional] _Number_ - The maximum content length in bytes. Set `Infinity` for no limit.
 
 ## Auth
 
@@ -311,6 +313,9 @@ await directus.auth.password.request(
 	'https://myapp.com' // In this case, the link will be https://myapp.com?token=FEE0A...
 );
 ```
+
+**Note**: To use a custom address you need to configure the
+[`PASSWORD_RESET_URL_ALLOW_LIST` environment variable](/self-hosted/config-options#security) to enable this feature.
 
 ### Reset a Password
 
@@ -423,7 +428,13 @@ one.
 
 ::: tip
 
-The axios instance can be used for custom requests by calling `await directus.transport.<method>('/path/to/endpoint', { /* body, params, ... */ })`
+The axios instance can be used for custom requests by calling:
+
+```ts
+await directus.transport.<method>('/path/to/endpoint', {
+	/* body, params, ... */
+});
+```
 
 :::
 
