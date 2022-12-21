@@ -33,7 +33,7 @@ configure your data model programmatically via the API. To learn more, see our A
 
 In order to understand how Directus handles data models, you will need an understanding of what relational data models
 are. This section provides a brief summary of the core concepts. It may be useful as a review, or for business users
-working on your team that want a simple explanation of how data models work. If you have a firm knowledge of relational
+working on your team that wants a simple explanation of how data models work. If you have a firm knowledge of relational
 data model concepts, such as databases, data tables, columns, data types, primary and foreign keys, rows, relationships,
 and schemas then feel free to jump to [Data Models in Directus](#data-models-in-directus).
 
@@ -264,7 +264,7 @@ information repeated again and again over millions or billions of rows, storage 
 
 ### Why We Use Relational Data Models
 
-As shown from the previous section, you want to make sure that every single data point is unique. This is where the
+As shown in the previous section, you want to make sure that every single data point is unique. This is where the
 _relational_ part of relational data models comes into play. To avoid data duplication, it is always best practice to
 _normalize your data model_, which is the technical term used to describe designing a data model so that there is no
 duplicate information stored _at all_. Instead of storing all information needed in a given situation in one table, like
@@ -321,7 +321,7 @@ Once you've designed your data model conceptually, you typically build and inter
 Querying Language. This language is used to create, read & query, update, and delete anything and everything in the
 database.
 
-Once the initial data tables are designed and built, a common next step is to build a backed using something like
+Once the initial data tables are designed and built, a common next step is to build a backend using something like
 Node.js or Flask. In your backend, you must code custom API endpoints and logic to create, read, query, update, and
 delete data for your specific data model. However, when the backend accesses data, it is still raw, with no stylization.
 Raw data is easy to work with for computers, but often quite difficult to work with for humans.
