@@ -33,7 +33,7 @@ configure your data model programmatically via the API. To learn more, see our A
 
 In order to understand how Directus handles data models, you will need an understanding of what relational data models
 are. This section provides a brief summary of the core concepts. It may be useful as a review, or for business users
-working on your team that wants a simple explanation of how data models work. If you have a firm knowledge of relational
+working on your team that want a simple explanation of how data models work. If you have a firm knowledge of relational
 data model concepts, such as databases, data tables, columns, data types, primary and foreign keys, rows, relationships,
 and schemas then feel free to jump to [Data Models in Directus](#data-models-in-directus).
 
