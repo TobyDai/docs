@@ -293,6 +293,7 @@ All the `DB_POOL__` prefixed options are passed to [`tarn.js`](https://github.co
 | `CONTENT_SECURITY_POLICY_*`      | Custom overrides for the Content-Security-Policy header. See [helmet's documentation](https://helmetjs.github.io) for more information.                          | --                       |
 | `HSTS_ENABLED`                   | Enable the Strict-Transport-Security policy header.                                                                                                              | `false`                  |
 | `HSTS_*`                         | Custom overrides for the Strict-Transport-Security header. See [helmet's documentation](https://helmetjs.github.io) for more information.                        | --                       |
+| `FLOWS_EXEC_ALLOWED_MODULES`     | CSV allowlist of node modules that are allowed to be used in the _run script_ operation in flows                                                                 | --                       |
 
 ::: tip Cookie Strictness
 
@@ -646,13 +647,14 @@ purposes, collection of additional metadata must be configured:
 
 ## Assets
 
-| Variable                               | Description                                                                                                                             | Default Value |
-| -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | ------------- |
-| `ASSETS_CACHE_TTL`                     | How long assets will be cached for in the browser. Sets the `max-age` value of the `Cache-Control` header.                              | `30d`         |
-| `ASSETS_TRANSFORM_MAX_CONCURRENT`      | How many file transformations can be done simultaneously                                                                                | `4`           |
-| `ASSETS_TRANSFORM_IMAGE_MAX_DIMENSION` | The max pixel dimensions size (width/height) that is allowed to be transformed                                                          | `6000`        |
-| `ASSETS_TRANSFORM_MAX_OPERATIONS`      | The max number of transform operations that is allowed to be processed (excludes saved presets)                                         | `5`           |
-| `ASSETS_CONTENT_SECURITY_POLICY`       | Custom overrides for the Content-Security-Policy header. See [helmet's documentation](https://helmetjs.github.io) for more information. | --            |
+| Variable                                 | Description                                                                                                                             | Default Value |
+| ---------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | ------------- |
+| `ASSETS_CACHE_TTL`                       | How long assets will be cached for in the browser. Sets the `max-age` value of the `Cache-Control` header.                              | `30d`         |
+| `ASSETS_TRANSFORM_MAX_CONCURRENT`        | How many file transformations can be done simultaneously                                                                                | `4`           |
+| `ASSETS_TRANSFORM_IMAGE_MAX_DIMENSION`   | The max pixel dimensions size (width/height) that is allowed to be transformed                                                          | `6000`        |
+| `ASSETS_TRANSFORM_MAX_OPERATIONS`        | The max number of transform operations that is allowed to be processed (excludes saved presets)                                         | `5`           |
+| `ASSETS_CONTENT_SECURITY_POLICY`         | Custom overrides for the Content-Security-Policy header. See [helmet's documentation](https://helmetjs.github.io) for more information. | --            |
+| `ASSETS_INVALID_IMAGE_SENSITIVITY_LEVEL` | Level of sensitivity to invalid images. See the [`sharp.failOn`](https://sharp.pixelplumbing.com/api-constructor#parameters) option     | `warning`     |
 
 Image transformations can be fairly heavy on memory usage. If you're using a system with 1GB or less available memory,
 we recommend lowering the allowed concurrent transformations to prevent you from overflowing your server.
